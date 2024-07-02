@@ -20,7 +20,7 @@ const Footer: React.FC = () => {
               streamline their database workflows.
             </Typography>
           </Grid>
-          <Grid item xs={12} md={5}>
+          <Grid item xs={12} md={5} marginLeft={{ 'lg': 12 }} >
             <Typography variant="h5" gutterBottom>
               Contact us
             </Typography>

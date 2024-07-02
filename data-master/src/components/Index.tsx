@@ -57,13 +57,14 @@ function Index() {
                   borderRadius: '100px',
                   boxShadow: 'none',
                   fontWeight: 'bold',
-                  fontSize: '18px',
-                  width: '170px',
+                  fontSize: '17px',
+                  width: '120px',
                   textTransform: 'none',
               }} 
               color="info">
-              Start for free
+              Sign Up
           </Button>
+
           <Button 
               variant="contained"
               sx={
@@ -72,7 +73,7 @@ function Index() {
                   borderRadius: '100px',
                   boxShadow: 'none',
                   fontWeight: 'bold',
-                  fontSize: '18px',
+                  fontSize: '17px',
                   width: '120px',
                   textTransform: 'none',
               }} 
