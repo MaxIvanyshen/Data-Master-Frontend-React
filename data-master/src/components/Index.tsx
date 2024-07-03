@@ -49,6 +49,7 @@ function Index() {
           <Typography variant="h6" fontWeight="bold" sx={{ ml: 2, flexGrow: 1 }}>
             Data Master
           </Typography>
+          <a href="/signup">
           <Button 
               variant="contained"
               sx={
@@ -64,7 +65,9 @@ function Index() {
               color="info">
               Sign Up
           </Button>
+          </a>
 
+          <a href="/login">
           <Button 
               variant="contained"
               sx={
@@ -80,6 +83,7 @@ function Index() {
               color="info">
               Log In
           </Button>
+          </a>
         </Toolbar>
       </AppBar>
       
@@ -102,9 +106,11 @@ function Index() {
           <Typography color='#35485F' sx={{ fontWeight: 'bold', fontSize: {'xs': '35px', 'sm': '50px', 'md': '65px', 'lg': '75px'}}} gutterBottom>
             Manage everything in one place
           </Typography>
+          <a href="/signup">
           <Button variant="contained" color="info" sx={{ textTransform: 'none', borderRadius: '100px', width: 200, height: 60, mt: 2, boxShadow: 'none', fontWeight: 'bold', fontSize: '25px' }}>
             Let's go!
           </Button>
+          </a>
         </Box>
       </Container>
      
@@ -128,9 +134,11 @@ function Index() {
                 </Typography>
               </CardContent>
               <CardActions>
+                <a href="/signup">
                 <Button size="small" variant='contained' color="info" style={{ textTransform: 'none',  marginLeft: 10, color: 'white', borderRadius: '25px', height: '40px', width: '120px', fontSize: '16px'}}>
                     {card.available ? "Try it out!" : "Notify me!"}
                 </Button>
+                </a>
               </CardActions>
             </Card>
           </Grid>
@@ -172,9 +180,11 @@ function Index() {
       </Box>
       </Container>
       <Box textAlign='center' paddingBottom={2}>
+          <a href="/signup">
           <Button variant="contained" color="info" sx={{ textTransform: 'none', borderRadius: '100px', width: 200, height: 60, mt: 2, boxShadow: 'none', fontWeight: 'bold', fontSize: '22px' }}>
-            Try for free!
+          Try for free!
           </Button>
+          </a>
       </Box>
       <Footer/>
     </ThemeProvider>
