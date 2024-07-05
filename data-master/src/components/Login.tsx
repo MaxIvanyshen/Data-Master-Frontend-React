@@ -24,24 +24,42 @@ const theme = createTheme({
 
 function Login() {
     const isMediumOrLarger = useMediaQuery(theme.breakpoints.up('md'));
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [error, setError] = useState('')
+    const [formData, setFormData] = useState({
+        email: "",
+        password: ""
+    });
 
-    const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setEmail(event.target.value);
+    const handleChange = (e: any) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value
+        });
     };
 
-    const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setPassword(event.target.value);
-    };
-
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        // Access the email and password state variables here
-        console.log('Email:', email);
-        console.log('Password:', password);
-        // Perform login action here
+        setError('')
+        try {
+            const response = await fetch('http://localhost:42069/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+            if(response.status === 400) {
+                setError('Invalid email format');
+            }
+            if(response.status === 401) {
+                setError('Invalid email or password') 
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     };
+
     return (
     <ThemeProvider theme={theme}>
          <Container 
@@ -69,8 +87,9 @@ function Login() {
                             variant="outlined"
                             type="email"
                             margin="normal"
-                            value={email}
-                            onChange={handleEmailChange}
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}        
                             InputLabelProps={{
                                 style: { color: 'white' },
                             }}
@@ -102,8 +121,9 @@ function Login() {
                             type="password"
                             variant="outlined"
                             margin="normal"
-                            value={password}
-                            onChange={handlePasswordChange}
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}        
                             InputLabelProps={{
                                 style: { color: 'white' },
                             }}
@@ -131,8 +151,18 @@ function Login() {
                             }}
                         />
                     </Box>
+                    {error && 
+                            <Typography 
+                            sx={{ 
+                                color: 'red',
+                                fontWeight: 'bold' 
+                            }}
+                                >
+                                {error}
+                            </Typography>
+                    }
+                    <a href="http://localhost:42069/oauth/google">
                     <Button 
-                            type="submit" 
                             variant="contained" 
                             color="info" 
                             startIcon={<GoogleIcon/>}
@@ -140,6 +170,7 @@ function Login() {
                         >
                             Continue with Google
                         </Button>
+                        </a>
                     <Box textAlign='center'>
                         <Button 
                                 type="submit" 

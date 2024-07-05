@@ -24,34 +24,42 @@ const theme = createTheme({
 
 function Signup() {
     const isMediumOrLarger = useMediaQuery(theme.breakpoints.up('md'));
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
+    const [error, setError] = useState('')
+    const [formData, setFormData] = useState({
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: ""
+    });
 
-    const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setEmail(event.target.value);
+    const handleChange = (e: any) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value
+        });
     };
 
-    const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setPassword(event.target.value);
-    };
-
-    const handleFirstNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setPassword(event.target.value);
-    };
-
-    const handleLastNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setPassword(event.target.value);
-    };
-
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        // Access the email and password state variables here
-        console.log('Email:', email);
-        console.log('Password:', password);
-        // Perform login action here
+        setError('')
+        try {
+            const response = await fetch('http://localhost:42069/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+            const result = await response.json();
+            if(response.status == 400) {
+                setError(result.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     };
+
     return (
     <ThemeProvider theme={theme}>
          <Container 
@@ -78,8 +86,10 @@ function Signup() {
                             label="First Name"
                             variant="outlined"
                             margin="normal"
-                            value={firstName}
-                            onChange={handleFirstNameChange}
+                            type="text"
+                            name="firstName"
+                            value={formData.firstName}
+                            onChange={handleChange}        
                             InputLabelProps={{
                                 style: { color: 'white' },
                             }}
@@ -109,10 +119,11 @@ function Signup() {
                         <TextField
                             label="Last Name"
                             variant="outlined"
-                            type="email"
                             margin="normal"
-                            value={lastName}
-                            onChange={handleLastNameChange}
+                            type="text"
+                            name="lastName"
+                            value={formData.lastName}
+                            onChange={handleChange}        
                             InputLabelProps={{
                                 style: { color: 'white' },
                             }}
@@ -144,8 +155,9 @@ function Signup() {
                             variant="outlined"
                             type="email"
                             margin="normal"
-                            value={email}
-                            onChange={handleEmailChange}
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}        
                             InputLabelProps={{
                                 style: { color: 'white' },
                             }}
@@ -177,8 +189,9 @@ function Signup() {
                             type="password"
                             variant="outlined"
                             margin="normal"
-                            value={password}
-                            onChange={handlePasswordChange}
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}        
                             InputLabelProps={{
                                 style: { color: 'white' },
                             }}
@@ -206,8 +219,18 @@ function Signup() {
                             }}
                         />
                     </Box>
+                    {error && 
+                            <Typography 
+                            sx={{ 
+                                color: 'red',
+                                fontWeight: 'bold' 
+                            }}
+                                >
+                                {error}
+                            </Typography>
+                    }
+                    <a href="http://localhost:42069/oauth/google">
                     <Button 
-                            type="submit" 
                             variant="contained" 
                             color="info" 
                             startIcon={<GoogleIcon/>}
@@ -215,6 +238,7 @@ function Signup() {
                         >
                             Continue with Google
                         </Button>
+                        </a>
                     <Box textAlign='center'>
                         <Button 
                                 type="submit" 
