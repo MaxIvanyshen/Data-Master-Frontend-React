@@ -1,4 +1,3 @@
-
 import { AppBar, Toolbar, Button, Typography, Container, Box, Grid, Card, CardContent, CardActions } from '@mui/material';
 import { createTheme, ThemeProvider, makeStyles } from '@mui/material/styles';
 import bg from './assets/bg.jpg'
@@ -8,6 +7,7 @@ import postgres from './assets/postgres.png'
 import mysql from './assets/mysql.png'
 import sqlite from './assets/sqlite.png'
 import Footer from './Footer';
+import { Navigate, useLocation } from 'react-router-dom'
 
 const theme = createTheme({
     typography: {
@@ -41,7 +41,31 @@ const cards: CardData[] = [
     {dbName: "SQLite", dbDescription: "Lightweight, serverless relational database designed for embedded and small-scale applications. Coming soon!", dbImage: sqlite, available: false},
 ];
 
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
+
+function useCheckAccessToken() {
+    const query = useQuery();
+    let token = query.get("token");
+
+    if(token === null) {
+        token = localStorage.getItem('accessToken')
+    } else {
+        localStorage.setItem('accessToken', token);
+    }
+
+    return token
+}
+
 function Index() {
+
+    const token = useCheckAccessToken();
+    
+    if(token !== null) {
+        return (<Navigate to="/dashboard"/>);
+    }
+
     return (<ThemeProvider theme={theme}>
       <AppBar position="static">
         <Toolbar style={{height: 75}}>

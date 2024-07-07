@@ -1,5 +1,6 @@
 import Index from './components/Index'
 import Login from './components/Login';
+import Dashboard from './components/Dashboard';
 import {
   Route,
   BrowserRouter,
@@ -14,6 +15,7 @@ function App() {
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
+                <Route path="/dashboard" element={<Dashboard />} />
             </Routes>
         </BrowserRouter>
     );
