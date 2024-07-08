@@ -1,14 +1,15 @@
 import { AppBar, Toolbar, Button, Typography, Container, Box, Grid, Card, CardContent, CardActions } from '@mui/material';
 import { createTheme, ThemeProvider, makeStyles } from '@mui/material/styles';
-import bg from './assets/bg.jpg';
 import icon from './assets/icon.png';
 import mongo from './assets/mongo.png'
 import postgres from './assets/postgres.png'
 import mysql from './assets/mysql.png'
 import sqlite from './assets/sqlite.png'
-import Footer from './Footer';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import authenticatedFetch from '../utils/apiUtil';
+import Header from './Header';
+import AddDatabase from './AddDatabase';
 
 const theme = createTheme({
     typography: {
@@ -44,27 +45,6 @@ function useCheckAccessToken() {
     return token
 }
 
-async function fetchDatabases(token: string) {
-    try {
-        const response = await fetch('http://localhost:42069/user', {
-            method: 'GET', // or 'POST', 'PUT', etc.
-            headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-        },
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const result = await response.json();
-        console.log(result);
-    } catch (error) {
-        console.log(error);
-    }
-}
-
 interface UserInfo {
     firstname: string;
     lastname: string;
@@ -74,24 +54,30 @@ interface UserInfo {
 
 function Dashboard() {
     const [data, setData] = useState(null);
+    const [redirect, setRedirect] = useState("");
+    const [addDb, setAddDb] = useState(false);
     const token = useCheckAccessToken();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('http://localhost:42069/user', {
-                    method: 'GET', // or 'POST', 'PUT', etc.
-                    headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                });
+                const fetchUrl = `${process.env.REACT_APP_BACKEND_URL}/user`
+                console.log(fetchUrl);
+                const response = await authenticatedFetch(fetchUrl)
 
-                if (!response.ok) {
+                if (response.status == 401) {
+                    setRedirect("/login")
+                    return
+                }
+                else if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
 
-                setData(await response.json());
+                const resp = await response.json();
+                setData(resp);
+                const userHasDatabases = resp.databases.size !== undefined;
+                setAddDb(!userHasDatabases);
+
             } catch (error) {
                 console.log(error);
             }
@@ -100,64 +86,23 @@ function Dashboard() {
         fetchData();
     }, []);
 
+    if(redirect !== "") {
+       return ( <Navigate to={redirect}/> ); 
+    }
+
     if(token === null) {
        return ( <Navigate to="/"/> ); 
     }
-
-    if(data !== null) {
-        const userHasDatabases = (data as UserInfo).databases.size !== undefined;
-        if(!userHasDatabases) {
-            return ( <Navigate to="/dashboard/add-database"/> );
-        }
-    }
     
     return (<ThemeProvider theme={theme}>
-      <AppBar position="static">
-        <Toolbar style={{height: 75}}>
-        <img src={icon} style={{ width: 50, height: 50, borderRadius: '12px' }} ></img>
-          <Typography variant="h6" fontWeight="bold" sx={{ ml: 2, flexGrow: 1 }}>
-            Data Master
-          </Typography>
-          <a href="/signup">
-          <Button 
-              variant="contained"
-              sx={
-              { 
-                  ml: 2,
-                  borderRadius: '100px',
-                  boxShadow: 'none',
-                  fontWeight: 'bold',
-                  fontSize: '17px',
-                  width: '120px',
-                  textTransform: 'none',
-              }} 
-              color="info">
-              Sign Up
-          </Button>
-          </a>
-
-          <a href="/login">
-          <Button 
-              variant="contained"
-              sx={
-              { 
-                  ml: 2,
-                  borderRadius: '100px',
-                  boxShadow: 'none',
-                  fontWeight: 'bold',
-                  fontSize: '17px',
-                  width: '120px',
-                  textTransform: 'none',
-              }} 
-              color="info">
-              Log In
-          </Button>
-          </a>
-        </Toolbar>
-      </AppBar>
-
-      <Container>
-      </Container>
+            <Header user={data}/>
+            {addDb ?
+                <AddDatabase/>
+                    : 
+                <Container>
+                    hello world
+                </Container>
+            }
       
     </ThemeProvider>
     );

@@ -42,7 +42,8 @@ function Login() {
         event.preventDefault();
         setError('')
         try {
-            const response = await fetch('http://localhost:42069/auth/login', {
+            const url = `${process.env.REACT_APP_BACKEND_URL}/auth/login`;
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -76,7 +77,13 @@ function Login() {
             >
             <Box sx={{ backgroundColor: '#35485F', textAlign: 'center', height: '100vh', width: { 'xs': '100%', 'md': '55%', 'lg': '23%'}, marginLeft: {'md': '-25px'}}}>
                 <Box sx={{ paddingTop: 6 }}>
-                    <img src={icon} style={{ width: 100 }}/>
+                    <a href="/" style={{ 
+                        textDecoration: 'none',
+                        textTransform: 'none',
+                        color: 'inherit',
+                    }}>
+                    <img src={icon} style={{ width: 50, height: 50, borderRadius: '12px' }} ></img>
+                    </a>
                     <Typography color='white' sx={{ fontWeight: 'bold', fontSize: '35px', textAlign: 'center', marginTop: 4}} gutterBottom>
                         Log In
                     </Typography>

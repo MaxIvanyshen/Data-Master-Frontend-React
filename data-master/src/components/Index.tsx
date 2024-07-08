@@ -69,7 +69,13 @@ function Index() {
     return (<ThemeProvider theme={theme}>
       <AppBar position="static">
         <Toolbar style={{height: 75}}>
-        <img src={icon} style={{ width: 50, height: 50, borderRadius: '12px' }} ></img>
+            <a href="/" style={{ 
+                textDecoration: 'none',
+                textTransform: 'none',
+                color: 'inherit',
+            }}>
+            <img src={icon} style={{ width: 50, height: 50, borderRadius: '12px' }} ></img>
+            </a>
           <Typography variant="h6" fontWeight="bold" sx={{ ml: 2, flexGrow: 1 }}>
             Data Master
           </Typography>
