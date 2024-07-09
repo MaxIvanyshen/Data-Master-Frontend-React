@@ -1,15 +1,12 @@
-import { AppBar, Toolbar, Button, Typography, Container, Box, Grid, Card, CardContent, CardActions } from '@mui/material';
+import { TextField, Typography, Container, Box, Grid, Card, CardContent, CardActions } from '@mui/material';
 import { createTheme, ThemeProvider, makeStyles } from '@mui/material/styles';
-import icon from './assets/icon.png';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 import bg from './assets/bg.jpg';
-import mongo from './assets/mongo.png'
-import postgres from './assets/postgres.png'
-import mysql from './assets/mysql.png'
-import sqlite from './assets/sqlite.png'
-import { Navigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import authenticatedFetch from '../utils/apiUtil';
-import Header from './Header';
+import PostgresForm from './dbDataForms/postgresForm';
+import MySQLForm from './dbDataForms/mysqlForm';
+import MongoForm from './dbDataForms/mongoForm';
 
 const theme = createTheme({
     typography: {
@@ -28,25 +25,95 @@ const theme = createTheme({
     },
 });
 
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function CustomTabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    </div>
+  );
+}
+
 function AddDatabase() {
+    const [value, setValue] = useState(0);
+
+    const handleChange = (_: React.SyntheticEvent, newValue: number) => {
+        setValue(newValue);
+    };
    
     return (<ThemeProvider theme={theme}>
       <Container 
+      sx={{
+                height: {'xs': '100vh', 'md': '91.9vh'},
+      }}
       style={{
                 width: '100%',
                 maxWidth: '100%',
-                height: '92.2vh',
                 marginLeft: 'auto',
                 marginRight: 'auto',
                 backgroundImage: `url(${bg})`,
                 backgroundPosition: 'bottom',
                 backgroundRepeat: 'no-repeat',
                 backgroundSize: 'cover',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
+                textAlign: 'center',
      }} maxWidth="xl">
 
+          <Container sx={{
+              paddingTop: '50px',
+          }}>
+              <Typography color='#35485F' sx={{ fontWeight: 'bold', fontSize: {'xs': '35px', 'sm': '50px', 'md': '65px'}}} gutterBottom>
+                Let's add a database!
+              </Typography>
+              <Container
+                sx={{
+                    backgroundColor: '#FEF7FF',
+                    width: '100%',
+                    borderRadius: '25px'
+                }}
+              >
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+                    <Tab sx={{
+                        color: '#5C4E8D',
+                        fontWeight: 'bold',
+                        textTransform: 'none',
+                    }} label="PostgreSQL" />
+                    <Tab sx={{
+                        color: '#5C4E8D',
+                        fontWeight: 'bold',
+                        textTransform: 'none',
+                    }} label="MySQL" />
+                    <Tab sx={{
+                        color: '#5C4E8D',
+                        fontWeight: 'bold',
+                        textTransform: 'none',
+                    }} label="MongoDB" />
+              </Tabs>
+            </Box>
+                <CustomTabPanel value={value} index={0}>
+                    <PostgresForm/>
+                </CustomTabPanel>
+                <CustomTabPanel value={value} index={1}>
+                    <MySQLForm/>
+                </CustomTabPanel>
+                <CustomTabPanel value={value} index={2}>
+                    <MongoForm/>
+                </CustomTabPanel>
+              </Container>
+          </Container>
       </Container>
     </ThemeProvider>
     );

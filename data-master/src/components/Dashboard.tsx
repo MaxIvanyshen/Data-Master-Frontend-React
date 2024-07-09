@@ -62,7 +62,6 @@ function Dashboard() {
         const fetchData = async () => {
             try {
                 const fetchUrl = `${process.env.REACT_APP_BACKEND_URL}/user`
-                console.log(fetchUrl);
                 const response = await authenticatedFetch(fetchUrl)
 
                 if (response.status == 401) {
@@ -75,7 +74,20 @@ function Dashboard() {
 
                 const resp = await response.json();
                 setData(resp);
-                const userHasDatabases = resp.databases.size !== undefined;
+                let psqlCount = 0;
+                let mysqlCount = 0;
+                let mongoCount = 0;
+                if(resp.databases["PostgreSQL"]) {
+                    psqlCount = resp.databases["PostgreSQL"].length;
+                }
+                if(resp.databases["MySQL"]) {
+                    mysqlCount = resp.databases["MySQL"].length;
+                }
+                if(resp.databases["MongoDB"]) {
+                    mongoCount = resp.databases["MongoDB"].length;
+                }
+
+                let userHasDatabases = psqlCount + mysqlCount + mongoCount !== 0;
                 setAddDb(!userHasDatabases);
 
             } catch (error) {
