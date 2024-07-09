@@ -88,7 +88,8 @@ function Dashboard() {
                 }
 
                 let userHasDatabases = psqlCount + mysqlCount + mongoCount !== 0;
-                setAddDb(!userHasDatabases);
+                //setAddDb(!userHasDatabases);
+                setAddDb(true);
             } catch (error) {
                 console.log(error);
             }
