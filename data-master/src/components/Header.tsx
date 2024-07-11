@@ -8,7 +8,7 @@ import SupportIcon from '@mui/icons-material/Support';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState } from 'react';
-import { Navigate, useHistory } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import authenticatedFetch from '../utils/apiUtil';
 
 const theme = createTheme({
@@ -55,7 +55,11 @@ function Header(user: any) {
     };
 
     return (
-      <AppBar position="static">
+      <AppBar 
+        style={{
+            boxShadow: 'none',
+        }}
+      position="static">
         <Toolbar style={{height: 75}}>
             <a href="/" style={{ 
                 textDecoration: 'none',

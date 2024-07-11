@@ -1,15 +1,44 @@
-import { AppBar, Toolbar, Button, Typography, Container, Box, Grid, Card, CardContent, CardActions } from '@mui/material';
+import { Toolbar, Drawer, Fab, Button, Typography, Container, Box, Grid, Card, CardContent, CardActions } from '@mui/material';
 import { createTheme, ThemeProvider, makeStyles } from '@mui/material/styles';
-import icon from './assets/icon.png';
-import mongo from './assets/mongo.png'
-import postgres from './assets/postgres.png'
-import mysql from './assets/mysql.png'
-import sqlite from './assets/sqlite.png'
 import { Navigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import authenticatedFetch from '../utils/apiUtil';
 import Header from './Header';
 import AddDatabase from './AddDatabase';
+import { Menu } from '@mui/icons-material';
+import { useMediaQuery } from '@mui/material';
+import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
+import { TreeViewBaseItem } from '@mui/x-tree-view/models';
+
+const MUI_X_PRODUCTS: TreeViewBaseItem[] = [
+  {
+    id: 'grid',
+    label: 'Data Grid',
+    children: [
+      { id: 'grid-community', label: '@mui/x-data-grid' },
+      { id: 'grid-pro', label: '@mui/x-data-grid-pro' },
+      { id: 'grid-premium', label: '@mui/x-data-grid-premium' },
+    ],
+  },
+  {
+    id: 'pickers',
+    label: 'Date and Time Pickers',
+    children: [
+      { id: 'pickers-community', label: '@mui/x-date-pickers' },
+      { id: 'pickers-pro', label: '@mui/x-date-pickers-pro' },
+    ],
+  },
+  {
+    id: 'charts',
+    label: 'Charts',
+    children: [{ id: 'charts-community', label: '@mui/x-charts' }],
+  },
+  {
+    id: 'tree-view',
+    label: 'Tree View',
+    children: [{ id: 'tree-view-community', label: '@mui/x-tree-view' }],
+  },
+];
 
 const theme = createTheme({
     typography: {
@@ -45,18 +74,13 @@ function useCheckAccessToken() {
     return token
 }
 
-interface UserInfo {
-    firstname: string;
-    lastname: string;
-    email: string;
-    databases: Map<String, object>
-}
-
 function Dashboard() {
     const [data, setData] = useState(null);
     const [redirect, setRedirect] = useState("");
     const [addDb, setAddDb] = useState(false);
+    const [treeViewOpen, setTreeViewOpen] = useState(true);
     const token = useCheckAccessToken();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     useEffect(() => {
         const fetchData = async () => {
@@ -88,8 +112,7 @@ function Dashboard() {
                 }
 
                 let userHasDatabases = psqlCount + mysqlCount + mongoCount !== 0;
-                //setAddDb(!userHasDatabases);
-                setAddDb(true);
+                setAddDb(!userHasDatabases);
             } catch (error) {
                 console.log(error);
             }
@@ -106,15 +129,58 @@ function Dashboard() {
        return ( <Navigate to="/"/> ); 
     }
     
+    const drawerWidth = 240;
+    const drawerVariant = isMobile ? 'temporary' : 'persistent';
     return (<ThemeProvider theme={theme}>
             <Header user={data}/>
             {addDb ?
                 <AddDatabase/>
                     : 
-                <Container>
-                    hello world
+                <Container
+                    style={{
+                        width: '100%',
+                        maxWidth: '100%',
+                    }}
+                    >
+                    
+                        <Box display='flex'>
+                        <Drawer 
+                        sx={{
+                            zIndex: -1,
+                            width: drawerWidth,
+                            flexShrink: 0,
+                            '& .MuiDrawer-paper': {
+                            backgroundColor: '#35485F',
+                            color: 'white',
+                                width: drawerWidth,
+                                boxSizing: 'border-box',
+                            },
+                        }}
+                            anchor='left'
+                        variant={drawerVariant} open={treeViewOpen}>
+                        <Toolbar sx={{ height: '80px' }}/>
+                            <RichTreeView items={MUI_X_PRODUCTS} />
+                        </Drawer>
+                        <Box>
+                            <Fab color="secondary"
+                            style={{
+                                position: 'fixed',
+                                top: '95px',
+                                left: treeViewOpen ? drawerWidth + 25 : 25,
+                                transition: 'left 0.2s',
+                                width: 50,
+                                height: 50,
+                                borderRadius: '12px',
+                            }}
+                            onClick={() => {setTreeViewOpen(!treeViewOpen)}}>
+                              <Menu />
+                            </Fab>
+                        </Box>
+                    </Box>
+
                 </Container>
             }
+
       
     </ThemeProvider>
     );
