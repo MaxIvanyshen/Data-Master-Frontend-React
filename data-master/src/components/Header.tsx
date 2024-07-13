@@ -59,6 +59,7 @@ function Header(user: any) {
         style={{
             boxShadow: 'none',
         }}
+
       position="static">
         <Toolbar style={{height: 75}}>
             <a href="/" style={{ 
