@@ -7,6 +7,7 @@ async function authenticatedFetch(url: string, options: RequestInit = {}): Promi
       };
     }
   }
+  console.log(options)
 
   try {
     const response = await fetch(url, options);

@@ -1,12 +1,15 @@
 import { Toolbar, Drawer, Fab, Tabs, Tab, Button, Typography, Container, Box, Grid, Card, CardContent, CardActions } from '@mui/material';
 import { createTheme, ThemeProvider, makeStyles } from '@mui/material/styles';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, MouseEventHandler } from 'react';
 import authenticatedFetch from '../utils/apiUtil';
+import DatabaseView from './dashboardViews/DatabaseView';
 import Header from './Header';
 import AddDatabase from './AddDatabase';
 import { Menu } from '@mui/icons-material';
 import { Edit } from '@mui/icons-material';
+import { Folder } from '@mui/icons-material';
+import { Storage } from '@mui/icons-material';
 import { useMediaQuery } from '@mui/material';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
@@ -36,18 +39,24 @@ interface ConnectionData {
   password: string;
 }
 
-interface Data {
+export interface Data {
   connection_data: ConnectionData;
   connection_string: string;
 }
 
-interface DatabaseEntry {
+export interface DatabaseEntry {
   id: number;
   userId: string;
-  db: number;
+  db: Db;
   data: Data;
   createdAt: string;
   updatedAt: string;
+}
+
+export enum Db {
+    PostgreSQL = 1,
+    MySQL,
+    MongoDB,
 }
 
 function useQuery() {
@@ -95,7 +104,7 @@ function Dashboard() {
     const [redirect, setRedirect] = useState("");
     const [addDb, setAddDb] = useState(false);
     const [treeViewOpen, setTreeViewOpen] = useState(true);
-    const [db, setCurrDB] = useState(null);
+    const [db, setCurrDB] = useState<DatabaseEntry>();
     const token = useCheckAccessToken();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -104,6 +113,10 @@ function Dashboard() {
     const handleChange = (_: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
+
+    const changeCurrDb = (data: DatabaseEntry) => {
+        setCurrDB(data);
+    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -134,8 +147,6 @@ function Dashboard() {
                 if(resp.databases["MongoDB"]) {
                     mongoCount = resp.databases["MongoDB"].length;
                 }
-
-                console.log(resp.databases);
 
                 let userHasDatabases = psqlCount + mysqlCount + mongoCount !== 0;
                 setAddDb(!userHasDatabases);
@@ -190,10 +201,20 @@ function Dashboard() {
                         variant='persistent' open={treeViewOpen}>
                         <SimpleTreeView>
                         { Object.entries(databases).map(([key, dbs]) => (
-                            <TreeItem itemId={key} label={key}>
+                            <TreeItem itemId={key} label={
+                                <Box display='flex'>
+                                    <Folder sx={{marginRight:'8px'}}/>
+                                    {key}
+                                </Box>
+                            }>
                             { dbs.map((data: DatabaseEntry)  => (
 
-                                <TreeItem itemId={"db-" + data.id} label={data.data.connection_data.database}/>
+                                <TreeItem onClick={() => changeCurrDb(data)} itemId={"db-" + data.id} label={
+                                    <Box display='flex'>
+                                        <Storage sx={{marginRight:'8px'}}/>
+                                        {data.data.connection_data.database}
+                                    </Box>
+                                }/>
                                 
                                               ))
                             }
@@ -228,7 +249,7 @@ function Dashboard() {
                     <Box marginTop={15} marginBottom={2} display='flex'>
 
                         <Typography fontWeight='bold' variant={isMobile ? 'h3' : 'h2'} color='#35485F'>
-                            {db}
+                            {db?.data.connection_data.database}
                         </Typography>
                             <Fab color="secondary"
                             style={{
@@ -274,7 +295,7 @@ function Dashboard() {
                             overview
                             </CustomTabPanel>
                             <CustomTabPanel value={value} index={1}>
-                            database
+                                <DatabaseView db={db}/>
                             </CustomTabPanel>
                             <CustomTabPanel value={value} index={2}>
                             sql
