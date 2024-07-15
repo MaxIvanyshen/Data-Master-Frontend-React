@@ -77,6 +77,7 @@ function useCheckAccessToken() {
 }
 
 interface TabPanelProps {
+
   children?: React.ReactNode;
   index: number;
   value: number;
@@ -128,11 +129,11 @@ function Dashboard() {
                     setRedirect("/login")
                     return
                 }
-                else if (!response.ok) {
+                else if (response.status != 200) {
                     throw new Error('Network response was not ok');
                 }
 
-                const resp = await response.json();
+                const resp = await response.data;
                 setData(resp);
                 setDbs(resp.databases);
                 let psqlCount = 0;
