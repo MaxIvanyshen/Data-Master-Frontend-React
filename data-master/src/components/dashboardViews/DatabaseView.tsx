@@ -1,10 +1,9 @@
 import { Tabs, Tab, Box, Container, Typography } from "@mui/material";
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridToolbar } from '@mui/x-data-grid';
 import { useEffect } from "react";
 import authenticatedFetch from "../../utils/apiUtil";
 import { DatabaseEntry, Db } from '../Dashboard';
 import { useState } from "react";
-import { setCommentRange } from "typescript";
 
 interface Props {
   db: DatabaseEntry | undefined;
@@ -15,6 +14,7 @@ interface TabPanelProps {
   index: number;
   value: number;
 }
+
 
 function CustomTabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
@@ -44,9 +44,18 @@ const DatabaseView: React.FC<Props> = ({db}) => {
         setCurrTable(tables[newValue]);
     };
 
+    const rowsWithId = rows.map((row, index) => ({ id: `row-${index}`, ...row }));
+
     useEffect(() => {
         const fetchData = async() => {
-            const resp = await authenticatedFetch(`${process.env.REACT_APP_BACKEND_URL}/postgres/tables?database=${db?.data.connection_data.database}`)
+            let provider = 'postgres';
+            if(db?.db === Db.MySQL) {
+                provider = 'mysql';
+            }
+            if(db?.db === Db.MongoDB) {
+                provider = 'mongo';
+            }
+            const resp = await authenticatedFetch(`${process.env.REACT_APP_BACKEND_URL}/${provider}/tables?database=${db?.data.connection_data.database}`)
             setTables(resp.data);
             if(!currTable) {
                 setCurrTable(tables[0]);
@@ -80,6 +89,9 @@ const DatabaseView: React.FC<Props> = ({db}) => {
             if(db?.db === Db.MySQL) {
                 provider = 'mysql';
             }
+            if(db?.db === Db.MongoDB) {
+                provider = 'mongo';
+            }
             const dbName = db?.data.connection_data.database;
             const resp = await authenticatedFetch(`${process.env.REACT_APP_BACKEND_URL}/${provider}/select`, {
                 method: 'POST',
@@ -97,18 +109,6 @@ const DatabaseView: React.FC<Props> = ({db}) => {
             console.log(newRows);
             await fetchColumns(newRows);
             setRows(newRows);
-/*
-            setRows(
-                [
-                    {
-                        "id": 1,
-                        "firstname": "Max",
-                        "lastname": "Ivanyshen"
-                    }
-                ]
-            );
-            */
-
         }
         fetchTable();
 
@@ -131,7 +131,7 @@ const DatabaseView: React.FC<Props> = ({db}) => {
                 <CustomTabPanel value={value} index={idx}>
                 <Box sx={{ height: 400, width: '100%' }}>
       <DataGrid
-        rows={rows}
+        rows={rowsWithId}
         columns={columns}
         initialState={{
           pagination: {
@@ -141,6 +141,7 @@ const DatabaseView: React.FC<Props> = ({db}) => {
           },
         }}
         pageSizeOptions={[5]}
+        slots={{ toolbar: GridToolbar }}
       />
     </Box>
                 </CustomTabPanel>

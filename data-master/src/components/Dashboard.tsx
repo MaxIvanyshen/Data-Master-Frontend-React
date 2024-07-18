@@ -105,6 +105,7 @@ function Dashboard() {
     const [redirect, setRedirect] = useState("");
     const [addDb, setAddDb] = useState(false);
     const [treeViewOpen, setTreeViewOpen] = useState(true);
+
     const [db, setCurrDB] = useState<DatabaseEntry>();
     const token = useCheckAccessToken();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -117,6 +118,7 @@ function Dashboard() {
 
     const changeCurrDb = (data: DatabaseEntry) => {
         setCurrDB(data);
+        setValue(0);
     }
 
     useEffect(() => {
