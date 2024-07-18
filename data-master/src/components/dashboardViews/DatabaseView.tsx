@@ -106,7 +106,6 @@ const DatabaseView: React.FC<Props> = ({db}) => {
                 }
             });
             const newRows = resp.data;
-            console.log(newRows);
             await fetchColumns(newRows);
             setRows(newRows);
         }
