@@ -41,7 +41,9 @@ function Header(user: any) {
     }
 
     const logout = () => {
-        authenticatedFetch(`${process.env.REACT_APP_BACKEND_URL}/auth/logout`)
+        authenticatedFetch(`${process.env.REACT_APP_BACKEND_URL}/auth/logout`, {
+            method: 'POST',
+        })
         localStorage.removeItem('accessToken');
         setRedirect("/");
     }

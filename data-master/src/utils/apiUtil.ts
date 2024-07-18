@@ -8,6 +8,10 @@ async function authenticatedFetch(url: string, options: AxiosRequestConfig = {})
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
     };
+    options = {
+        ...options,
+        withCredentials: false,
+    }
   }
 
   try {
@@ -17,7 +21,7 @@ async function authenticatedFetch(url: string, options: AxiosRequestConfig = {})
     if (axios.isAxiosError(error) && error.response?.status === 401) {
       try {
         const refreshTokenResponse = await axios.post(`${process.env.REACT_APP_BACKEND_REFRESH_TOKEN_URL}`, {}, {
-          withCredentials: true,
+            withCredentials: true
         });
 
         const { accessToken } = refreshTokenResponse.data;
