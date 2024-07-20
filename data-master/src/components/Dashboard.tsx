@@ -101,11 +101,13 @@ function CustomTabPanel(props: TabPanelProps) {
   );
 }
 
+
 function Dashboard() {
     const [data, setData] = useState(null);
     const [databases, setDbs] = useState(new Map<string, DatabaseEntry[]>);
     const [redirect, setRedirect] = useState("");
     const [addDb, setAddDb] = useState(false);
+    const [userHasDatabases, setUserHasDatabases] = useState(false);
     const [treeViewOpen, setTreeViewOpen] = useState(true);
 
     const [db, setCurrDB] = useState<DatabaseEntry>();
@@ -122,6 +124,18 @@ function Dashboard() {
         setCurrDB(data);
         setValue(0);
     }
+
+    const addDbComponent = (userHasDatabases: boolean) => {
+    return (
+        <Box>
+        { userHasDatabases ? 
+            <AddDatabase setAddDb={setAddDb}/>
+            :
+            <AddDatabase setAddDb={undefined}/>
+        }
+        </Box>
+    );
+}
 
     useEffect(() => {
         const fetchData = async () => {
@@ -153,7 +167,7 @@ function Dashboard() {
                     mongoCount = resp.databases["MongoDB"].length;
                 }
 
-                let userHasDatabases = psqlCount + mysqlCount + mongoCount !== 0;
+                await setUserHasDatabases(psqlCount + mysqlCount + mongoCount !== 0);
                 setAddDb(!userHasDatabases);
             } catch (error) {
                 console.log(error);
@@ -180,7 +194,7 @@ function Dashboard() {
                 }}
             />
             {addDb ?
-                <AddDatabase setAddDb={setAddDb}/>
+                addDbComponent(userHasDatabases)
                     : 
                 <Container
                     sx={{

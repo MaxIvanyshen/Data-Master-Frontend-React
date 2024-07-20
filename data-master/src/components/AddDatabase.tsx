@@ -49,7 +49,7 @@ function CustomTabPanel(props: TabPanelProps) {
 }
 
 interface AddDatabaseProps {
-   setAddDb: (setDb: boolean) => void;
+   setAddDb?: (setDb: boolean) => void;
 }
 
 const AddDatabase: React.FC<AddDatabaseProps> = ({ setAddDb }) => {
@@ -109,6 +109,7 @@ const AddDatabase: React.FC<AddDatabaseProps> = ({ setAddDb }) => {
               </Tabs>
             </Box>
             <Box>
+            { setAddDb ? 
                 <Fab color="secondary"
                 style={{
                     position: 'fixed',
@@ -122,6 +123,9 @@ const AddDatabase: React.FC<AddDatabaseProps> = ({ setAddDb }) => {
                 onClick={() => {setAddDb(false)}}>
                     <ArrowBack/>
                 </Fab>
+                :
+                <Box/>
+            }
             </Box>
                 <CustomTabPanel value={value} index={0}>
                     <PostgresForm/>
