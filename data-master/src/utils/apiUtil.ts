@@ -1,6 +1,9 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
-async function authenticatedFetch(url: string, options: AxiosRequestConfig = {}): Promise<AxiosResponse> {
+async function authenticatedFetch(
+    url: string,
+    options: AxiosRequestConfig = {},
+): Promise<AxiosResponse | undefined> {
   const token = localStorage.getItem('accessToken');
   if (token) {
     options.headers = {
@@ -42,8 +45,8 @@ async function authenticatedFetch(url: string, options: AxiosRequestConfig = {})
         throw refreshError;
       }
     } else {
-      console.error('Fetch error:', error);
-      throw error;
+        console.error('Fetch error:', error);
+        throw error;
     }
   }
 }

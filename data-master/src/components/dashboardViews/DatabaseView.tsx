@@ -56,7 +56,7 @@ const DatabaseView: React.FC<Props> = ({db}) => {
                 provider = 'mongo';
             }
             const resp = await authenticatedFetch(`${process.env.REACT_APP_BACKEND_URL}/${provider}/tables?database=${db?.data.connection_data.database}`)
-            setTables(resp.data);
+            setTables(resp?.data);
             if(!currTable) {
                 setCurrTable(tables[0]);
             }
@@ -105,7 +105,7 @@ const DatabaseView: React.FC<Props> = ({db}) => {
                     },
                 }
             });
-            const newRows = resp.data;
+            const newRows = resp?.data;
             await fetchColumns(newRows);
             setRows(newRows);
         }

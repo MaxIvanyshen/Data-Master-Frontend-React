@@ -129,11 +129,11 @@ function Dashboard() {
                 const fetchUrl = `${process.env.REACT_APP_BACKEND_URL}/user`
                 const response = await authenticatedFetch(fetchUrl)
 
-                if (response.status == 401) {
+                if (response?.status == 401) {
                     setRedirect("/login")
                     return
                 }
-                else if (response.status != 200) {
+                else if (response?.status != 200) {
                     throw new Error('Network response was not ok');
                 }
 
@@ -255,7 +255,7 @@ function Dashboard() {
                             transition: 'margin-left 0.3s',
                         }}
                     >
-                    <Box marginTop={15} marginBottom={2} display='flex'>
+                    <Box marginTop={12} marginBottom={2} display='flex'>
 
                         <Typography fontWeight='bold' variant={isMobile ? 'h3' : 'h2'} color='#35485F'>
                             {db?.data.connection_data.database}
