@@ -1,4 +1,4 @@
-import { TextField, Typography, Container, Box, Grid, Card, CardContent, CardActions } from '@mui/material';
+import { TextField, Typography, Container, Box, Grid, Card, CardContent, CardActions, Fab } from '@mui/material';
 import { createTheme, ThemeProvider, makeStyles } from '@mui/material/styles';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import PostgresForm from './dbDataForms/postgresForm';
 import MySQLForm from './dbDataForms/mysqlForm';
 import MongoForm from './dbDataForms/mongoForm';
+import { ArrowBack } from '@mui/icons-material';
 
 const theme = createTheme({
     typography: {
@@ -47,7 +48,11 @@ function CustomTabPanel(props: TabPanelProps) {
   );
 }
 
-function AddDatabase() {
+interface AddDatabaseProps {
+   setAddDb: (setDb: boolean) => void;
+}
+
+const AddDatabase: React.FC<AddDatabaseProps> = ({ setAddDb }) => {
     const [value, setValue] = useState(0);
 
     const handleChange = (_: React.SyntheticEvent, newValue: number) => {
@@ -102,6 +107,21 @@ function AddDatabase() {
                         textTransform: 'none',
                     }} label="MongoDB" />
               </Tabs>
+            </Box>
+            <Box>
+                <Fab color="secondary"
+                style={{
+                    position: 'fixed',
+                    top: '95px',
+                    left: 25,
+                    transition: 'left 0.2s',
+                    width: 50,
+                    height: 50,
+                    borderRadius: '12px',
+                }}
+                onClick={() => {setAddDb(false)}}>
+                    <ArrowBack/>
+                </Fab>
             </Box>
                 <CustomTabPanel value={value} index={0}>
                     <PostgresForm/>

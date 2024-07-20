@@ -69,7 +69,7 @@ function PostgresForm() {
     }
 
     if(redirect !== "") {
-        return (<Navigate to="/"/>)
+        return (<Navigate to={redirect}/>)
     }
     return (
         <Container style={{ display:'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>

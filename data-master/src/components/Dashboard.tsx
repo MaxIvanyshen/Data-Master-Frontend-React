@@ -180,7 +180,7 @@ function Dashboard() {
                 }}
             />
             {addDb ?
-                <AddDatabase/>
+                <AddDatabase setAddDb={setAddDb}/>
                     : 
                 <Container
                     sx={{
