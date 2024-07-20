@@ -1,5 +1,6 @@
-import { Tabs, Tab, Box, Container, Typography } from "@mui/material";
+import { Tabs, Tab, Box, Container, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 import { DataGrid, GridColDef, GridToolbar } from '@mui/x-data-grid';
+import ErrorIcon from '@mui/icons-material/Error';
 import { useEffect } from "react";
 import authenticatedFetch from "../../utils/apiUtil";
 import { DatabaseEntry, Db } from '../Dashboard';
@@ -39,6 +40,9 @@ const DatabaseView: React.FC<Props> = ({db}) => {
     const [rows, setRows] = useState<object[]>([]);
     const [columns, setColumns] = useState<readonly GridColDef<object, any, any>[]>([]);
 
+    const [error, setError] = useState("");
+    const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+
     const handleChange = (_: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
         setCurrTable(tables[newValue]);
@@ -55,10 +59,15 @@ const DatabaseView: React.FC<Props> = ({db}) => {
             if(db?.db === Db.MongoDB) {
                 provider = 'mongo';
             }
-            const resp = await authenticatedFetch(`${process.env.REACT_APP_BACKEND_URL}/${provider}/tables?database=${db?.data.connection_data.database}`)
-            setTables(resp?.data);
-            if(!currTable) {
-                setCurrTable(tables[0]);
+            try {
+                const resp = await authenticatedFetch(`${process.env.REACT_APP_BACKEND_URL}/${provider}/tables?database=${db?.data.connection_data.database}`)
+                setTables(resp?.data);
+                if(!currTable) {
+                    setCurrTable(tables[0]);
+                }
+            } catch(error: any) {
+                setError("Error while connecting to database");
+                setErrorDialogOpen(true);
             }
         }
         fetchData();
@@ -92,22 +101,27 @@ const DatabaseView: React.FC<Props> = ({db}) => {
             if(db?.db === Db.MongoDB) {
                 provider = 'mongo';
             }
-            const dbName = db?.data.connection_data.database;
-            const resp = await authenticatedFetch(`${process.env.REACT_APP_BACKEND_URL}/${provider}/select`, {
-                method: 'POST',
-                data: {
-                    "database": dbName,
-                    "table": currTable,
-                    "data": {
-                        "query": {
+            try {
+                const dbName = db?.data.connection_data.database;
+                const resp = await authenticatedFetch(`${process.env.REACT_APP_BACKEND_URL}/${provider}/select`, {
+                    method: 'POST',
+                    data: {
+                        "database": dbName,
+                        "table": currTable,
+                        "data": {
+                            "query": {
 
-                        }
-                    },
-                }
-            });
-            const newRows = resp?.data;
-            await fetchColumns(newRows);
-            setRows(newRows);
+                            }
+                        },
+                    }
+                });
+                const newRows = resp?.data;
+                await fetchColumns(newRows);
+                setRows(newRows);
+            } catch(error: any) {
+                setError("Error while fetching table");
+                setErrorDialogOpen(true);
+            }
         }
         fetchTable();
 
@@ -145,6 +159,36 @@ const DatabaseView: React.FC<Props> = ({db}) => {
     </Box>
                 </CustomTabPanel>
             ))}
+
+            <Dialog 
+                open={errorDialogOpen}
+                onClose={() => setErrorDialogOpen(false)}
+             maxWidth="xs" fullWidth>
+          <DialogTitle>
+            <Typography variant="h6" color="error">
+              <ErrorIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
+              Error
+            </Typography>
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="body1">
+              {error}
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+           <Box sx={{textAlign: 'center'}}>
+            <Button onClick={() => { setErrorDialogOpen(false) }}
+            sx={{
+                borderRadius: '12px',
+                fontSize: '17px',
+                textTransform: 'none',
+            }}
+            color="info" variant="contained">
+              Close
+            </Button>
+            </Box>
+          </DialogActions>
+        </Dialog>
         </Container>
     )
 }
