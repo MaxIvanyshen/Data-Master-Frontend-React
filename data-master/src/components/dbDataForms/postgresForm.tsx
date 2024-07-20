@@ -18,16 +18,22 @@ function PostgresForm() {
         database: "",
         user: "",
         password: "",
-        allowQueries: false,
+        allowCustomQuery: true,
     });
     const [redirect, setRedirect] = useState("");
+
+    function handleSwitchChange(e: React.ChangeEvent<HTMLInputElement>) {
+            setFormData({
+                ...formData,
+                allowCustomQuery: e.target.checked
+            });
+    }
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         const { name, value } = e.target;
         setFormData({
             ...formData,
             [name]: value,
-            allowQueries: !e.target.checked
         });
     }
 
@@ -51,6 +57,7 @@ function PostgresForm() {
                         "password": formData.password,
                         "database": formData.database,
                     },
+                    "allowCustomQuery": formData.allowCustomQuery,
                 })
             });
             if(response.status == 200) {
@@ -301,7 +308,7 @@ function PostgresForm() {
                                         Allow custom queries:
                                     </Typography>
                                     <Box marginTop='-2px'>
-                                        <Switch color="info" value={formData.allowQueries} onChange={handleChange}/>
+                                        <Switch color="info" value={formData.allowCustomQuery} onChange={handleSwitchChange}/>
                                     </Box>
                                 </Box>
                                 <Typography variant="body2" style={{ width: '50%', marginLeft: '90px' , textAlign: 'left' }}  color="textSecondary">

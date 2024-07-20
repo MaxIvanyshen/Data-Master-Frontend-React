@@ -13,6 +13,7 @@ import { Storage } from '@mui/icons-material';
 import { useMediaQuery } from '@mui/material';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
+import SqlEditorView from './dashboardViews/SqlEditorView';
 
 const theme = createTheme({
     typography: {
@@ -40,6 +41,7 @@ interface ConnectionData {
 }
 
 export interface Data {
+  allowCustomQuery: boolean;
   connection_data: ConnectionData;
   connection_string: string;
 }
@@ -224,6 +226,10 @@ function Dashboard() {
                             </TreeItem>
                         ))}
                           </SimpleTreeView>
+
+                          <Button variant='contained' onClick={() => {setAddDb(!addDb)}} color='info'>
+                            Add a Database
+                          </Button>
                         </Drawer>
                         <Box>
                             <Fab color="secondary"
@@ -301,7 +307,7 @@ function Dashboard() {
                                 <DatabaseView db={db}/>
                             </CustomTabPanel>
                             <CustomTabPanel value={value} index={2}>
-                            sql
+                                <SqlEditorView db={db}/>
                             </CustomTabPanel>
                             </Container>
                         </Container>

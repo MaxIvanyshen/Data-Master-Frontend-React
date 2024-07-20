@@ -1,4 +1,0 @@
-{
-    "backendURL": "http://localhost:42069",
-    "backendRefreshTokenURL": `${backendURL}/auth/refresh`,
-}
