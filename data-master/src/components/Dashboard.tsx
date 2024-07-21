@@ -1,11 +1,10 @@
 import { Toolbar, Drawer, Fab, Tabs, Tab, Button, Typography, Container, Box, Grid, Card, CardContent, CardActions, Divider } from '@mui/material';
 import { createTheme, ThemeProvider, makeStyles } from '@mui/material/styles';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect, MouseEventHandler } from 'react';
 import authenticatedFetch from '../utils/apiUtil';
 import DatabaseView from './dashboardViews/DatabaseView';
 import Header from './Header';
-import AddDatabase from './AddDatabase';
 import { Add, Menu } from '@mui/icons-material';
 import { Edit } from '@mui/icons-material';
 import { Folder } from '@mui/icons-material';
@@ -105,18 +104,16 @@ function CustomTabPanel(props: TabPanelProps) {
 function Dashboard() {
     const [data, setData] = useState(null);
     const [databases, setDbs] = useState(new Map<string, DatabaseEntry[]>);
-    const [redirect, setRedirect] = useState("");
-    const [addDb, setAddDb] = useState(false);
     const [userHasDatabases, setUserHasDatabases] = useState(false);
     const [treeViewOpen, setTreeViewOpen] = useState(true);
-
-    const [addDbTab, setAddDbTab] = useState(0);
 
     const [db, setCurrDB] = useState<DatabaseEntry>();
     const token = useCheckAccessToken();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const [value, setValue] = useState(0);
+
+    const navigate = useNavigate();
 
     const handleChange = (_: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
@@ -127,26 +124,24 @@ function Dashboard() {
         setValue(0);
     }
 
-    const addDbComponent = (userHasDatabases: boolean) => {
-    return (
-        <Box>
-        { userHasDatabases ? 
-            <AddDatabase setAddDb={setAddDb} tabIdx={addDbTab}/>
-            :
-            <AddDatabase />
-        }
-        </Box>
-    );
-}
-
     useEffect(() => {
+        const setFirstCurrDb = async (map: Map<String, object[]>) => {
+            console.log(map);
+            Object.entries(map).map(([key, value]) => {
+                if (value.length > 0) {
+                    setCurrDB(value[0]);
+                    return;
+                }
+            });
+        }
+
         const fetchData = async () => {
             try {
                 const fetchUrl = `${process.env.REACT_APP_BACKEND_URL}/user`
                 const response = await authenticatedFetch(fetchUrl)
 
                 if (response?.status == 401) {
-                    setRedirect("/login")
+                    navigate("/login");
                     return
                 }
                 else if (response?.status != 200) {
@@ -154,8 +149,8 @@ function Dashboard() {
                 }
 
                 const resp = await response.data;
-                setData(resp);
-                setDbs(resp.databases);
+                await setData(resp);
+                await setDbs(resp.databases);
                 let psqlCount = 0;
                 let mysqlCount = 0;
                 let mongoCount = 0;
@@ -170,7 +165,7 @@ function Dashboard() {
                 }
 
                 await setUserHasDatabases(psqlCount + mysqlCount + mongoCount !== 0);
-                setAddDb(!userHasDatabases);
+                await setFirstCurrDb(resp.databases);
             } catch (error) {
                 console.log(error);
             }
@@ -179,12 +174,13 @@ function Dashboard() {
         fetchData();
     }, []);
 
-    if(redirect !== "") {
-       return ( <Navigate to={redirect}/> ); 
+
+    if(!userHasDatabases) {
+        navigate("/add-database");
     }
 
     if(token === null) {
-       return ( <Navigate to="/"/> ); 
+        navigate("/");
     }
     
     const drawerWidth = 240;
@@ -195,9 +191,6 @@ function Dashboard() {
                     zIndex: theme.zIndex.drawer + 2,
                 }}
             />
-            {addDb ?
-                addDbComponent(userHasDatabases)
-                    : 
                 <Container
                     sx={{
                         width: '100%',
@@ -222,7 +215,7 @@ function Dashboard() {
                         variant='persistent' open={treeViewOpen}>
                         <SimpleTreeView>
                         { Object.entries(databases).map(([key, dbs], idx) => (
-                            <TreeItem onClick={() => setAddDbTab(idx)} itemId={key} label={
+                            <TreeItem itemId={key} label={
                                 <Box display='flex'>
                                     <Folder sx={{marginRight:'8px'}}/>
                                     {key}
@@ -241,7 +234,10 @@ function Dashboard() {
                                 
                                               ))
                             }
-                            <TreeItem onClick={() => setAddDb(true)} itemId={`addDb-${key}`} label={
+                            <TreeItem onClick={() => {
+                                localStorage.setItem('addDbTab', idx.toString());
+                                navigate("/add-database");
+                            }} itemId={`addDb-${key}`} label={
                                 <Box display='flex'>
                                    <Add sx={{ marginRight: '8px' }}/>
                                    Add a Database
@@ -313,11 +309,15 @@ function Dashboard() {
                                 fontWeight: 'bold',
                                 textTransform: 'none',
                             }} label="Database" />
-                            <Tab sx={{
-                                color: '#5C4E8D',
-                                fontWeight: 'bold',
-                                textTransform: 'none',
-                            }} label="SQL Editor" />
+                            { db?.db != Db.MongoDB ?
+                                <Tab sx={{
+                                    color: '#5C4E8D',
+                                    fontWeight: 'bold',
+                                    textTransform: 'none',
+                                }} label="SQL Editor" />
+                                :
+                                <Box/>
+                            }
                             </Tabs>
                             </Box>
                             <CustomTabPanel value={value} index={0}>
@@ -326,15 +326,16 @@ function Dashboard() {
                             <CustomTabPanel value={value} index={1}>
                                 <DatabaseView db={db}/>
                             </CustomTabPanel>
-                            <CustomTabPanel value={value} index={2}>
-                                <SqlEditorView db={db}/>
-                            </CustomTabPanel>
+                            { db?.db != Db.MongoDB ?
+                                <CustomTabPanel value={value} index={2}>
+                                    <SqlEditorView db={db}/>
+                                </CustomTabPanel>
+                                :
+                                <Box/>
+                            }
                             </Container>
                         </Container>
                     </Container>
-            }
-
-      
     </ThemeProvider>
     );
 };

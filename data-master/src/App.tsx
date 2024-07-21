@@ -7,6 +7,7 @@ import {
   Routes,
 } from "react-router-dom";
 import Signup from './components/Signup';
+import AddDatabase from './components/AddDatabase';
 
 function App() {
     return (
@@ -16,6 +17,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/add-database" element={<AddDatabase />} />
             </Routes>
         </BrowserRouter>
     );

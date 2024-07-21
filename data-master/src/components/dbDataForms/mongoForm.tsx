@@ -7,7 +7,7 @@ import {
     Button,
     Typography,
 } from "@mui/material";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function MongoForm() {
     const [formData, setFormData] = useState({
@@ -18,7 +18,6 @@ function MongoForm() {
         user: "",
         password: "",
     });
-    const [redirect, setRedirect] = useState("");
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         const { name, value } = e.target;
@@ -27,6 +26,8 @@ function MongoForm() {
             [name]: value,
         });
     }
+
+    const navigate = useNavigate();
 
     async function sendDbData(e: any) {
         e.preventDefault();
@@ -50,16 +51,12 @@ function MongoForm() {
                     },
                 })
             });
-            if(response.status == 200) {
-                setRedirect("/dashboard");
+            if(response.status === 200) {
+                navigate("/dashboard");
             }
         } catch (error) {
             console.error('Error:', error);
         }
-    }
-
-    if(redirect !== "") {
-        return (<Navigate to={redirect}/>)
     }
     return (
         <Container style={{ display:'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
@@ -306,4 +303,8 @@ function MongoForm() {
 }
 
 export default MongoForm;
+
+function useHavigate() {
+    throw new Error("Function not implemented.");
+}
 

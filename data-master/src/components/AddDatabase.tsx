@@ -8,6 +8,9 @@ import PostgresForm from './dbDataForms/postgresForm';
 import MySQLForm from './dbDataForms/mysqlForm';
 import MongoForm from './dbDataForms/mongoForm';
 import { ArrowBack } from '@mui/icons-material';
+import Header from './Header';
+import { useNavigate } from 'react-router-dom';
+import authenticatedFetch from '../utils/apiUtil';
 
 const theme = createTheme({
     typography: {
@@ -48,19 +51,42 @@ function CustomTabPanel(props: TabPanelProps) {
   );
 }
 
-interface AddDatabaseProps {
-   setAddDb?: (setDb: boolean) => void;
-   tabIdx?: number;
-}
+const AddDatabase = () => {
+    const tabIdx = localStorage.getItem('addDbTab');
+    const [value, setValue] = useState(tabIdx ? +tabIdx : 0);
+    const [data, setData] = useState({});
 
-const AddDatabase: React.FC<AddDatabaseProps> = ({ setAddDb, tabIdx }) => {
-    const [value, setValue] = useState(tabIdx ? tabIdx : 0);
+    const navigate = useNavigate();
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const fetchUrl = `${process.env.REACT_APP_BACKEND_URL}/user`
+                const response = await authenticatedFetch(fetchUrl)
+
+                if (response?.status == 401) {
+                    navigate("/login");
+                    return
+                }
+                else if (response?.status != 200) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const resp = await response.data;
+                setData(resp);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        fetchData();
+    }, []);
     const handleChange = (_: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
    
     return (<ThemeProvider theme={theme}>
+        <Header user={data}/>
       <Container 
       sx={{
                 height: {'xs': '100vh', 'md': '91.9vh'},
@@ -108,25 +134,6 @@ const AddDatabase: React.FC<AddDatabaseProps> = ({ setAddDb, tabIdx }) => {
                         textTransform: 'none',
                     }} label="MongoDB" />
               </Tabs>
-            </Box>
-            <Box>
-            { setAddDb ? 
-                <Fab color="secondary"
-                style={{
-                    position: 'fixed',
-                    top: '95px',
-                    left: 25,
-                    transition: 'left 0.2s',
-                    width: 50,
-                    height: 50,
-                    borderRadius: '12px',
-                }}
-                onClick={() => {setAddDb(false)}}>
-                    <ArrowBack/>
-                </Fab>
-                :
-                <Box/>
-            }
             </Box>
                 <CustomTabPanel value={value} index={0}>
                     <PostgresForm/>

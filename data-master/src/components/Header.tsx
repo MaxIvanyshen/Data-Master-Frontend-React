@@ -8,7 +8,7 @@ import SupportIcon from '@mui/icons-material/Support';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import authenticatedFetch from '../utils/apiUtil';
 
 const theme = createTheme({
@@ -29,23 +29,25 @@ const theme = createTheme({
 });
 
 
-function Header(user: any) {
-    user = user.user;
+function Header(user?: any) {
+    const savedUser = localStorage.getItem('user');
+    if(savedUser) {
+        user = savedUser;
+    } else {
+        user = user.user;
+    }
 
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
-    const [redirect, setRedirect] = useState("");
 
-    if (redirect != "") {
-        return <Navigate to={ redirect } />;
-    }
+    const navigate = useNavigate();
 
     const logout = () => {
         authenticatedFetch(`${process.env.REACT_APP_BACKEND_URL}/auth/logout`, {
             method: 'POST',
         })
         localStorage.removeItem('accessToken');
-        setRedirect("/");
+        navigate("/");
     }
 
     const handleClick = (event: any) => {

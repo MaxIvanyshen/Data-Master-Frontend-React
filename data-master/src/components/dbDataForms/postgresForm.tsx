@@ -8,7 +8,7 @@ import {
     Typography,
     Switch,
 } from "@mui/material";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 function PostgresForm() {
     const [formData, setFormData] = useState({
@@ -20,7 +20,8 @@ function PostgresForm() {
         password: "",
         allowCustomQuery: true,
     });
-    const [redirect, setRedirect] = useState("");
+
+    const navigate = useNavigate();
 
     function handleSwitchChange(e: React.ChangeEvent<HTMLInputElement>) {
             setFormData({
@@ -60,16 +61,10 @@ function PostgresForm() {
                     "allowCustomQuery": formData.allowCustomQuery,
                 })
             });
-            if(response.status == 200) {
-                setRedirect("/dashboard");
-            }
+            navigate("/dashboard");
         } catch (error) {
             console.error('Error:', error);
         }
-    }
-
-    if(redirect !== "") {
-        return (<Navigate to={redirect}/>)
     }
     return (
         <Container style={{ display:'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>

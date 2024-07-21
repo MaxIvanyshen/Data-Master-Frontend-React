@@ -8,7 +8,7 @@ import {
     Typography,
     Switch,
 } from "@mui/material";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 function MySQLForm() {
     const [formData, setFormData] = useState({
@@ -20,7 +20,6 @@ function MySQLForm() {
         password: "",
         allowCustomQuery: false,
     });
-    const [redirect, setRedirect] = useState("");
 
     function handleSwitchChange(e: React.ChangeEvent<HTMLInputElement>) {
         setFormData({
@@ -38,6 +37,8 @@ function MySQLForm() {
             allowCustomQuery: !e.target.checked
         });
     }
+
+    const navigate = useNavigate();
 
     async function sendDbData(e: any) {
         e.preventDefault();
@@ -62,16 +63,10 @@ function MySQLForm() {
                     "allowCustomQuery": formData.allowCustomQuery,
                 })
             });
-            if(response.status == 200) {
-                setRedirect("/dashboard");
-            }
+            navigate("/dashboard");
         } catch (error) {
             console.error('Error:', error);
         }
-    }
-
-    if(redirect !== "") {
-        return (<Navigate to={redirect}/>)
     }
     return (
         <Container style={{ display:'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
