@@ -1,4 +1,4 @@
-import { Toolbar, Drawer, Fab, Tabs, Tab, Button, Typography, Container, Box, Grid, Card, CardContent, CardActions } from '@mui/material';
+import { Toolbar, Drawer, Fab, Tabs, Tab, Button, Typography, Container, Box, Grid, Card, CardContent, CardActions, Divider } from '@mui/material';
 import { createTheme, ThemeProvider, makeStyles } from '@mui/material/styles';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useState, useEffect, MouseEventHandler } from 'react';
@@ -6,7 +6,7 @@ import authenticatedFetch from '../utils/apiUtil';
 import DatabaseView from './dashboardViews/DatabaseView';
 import Header from './Header';
 import AddDatabase from './AddDatabase';
-import { Menu } from '@mui/icons-material';
+import { Add, Menu } from '@mui/icons-material';
 import { Edit } from '@mui/icons-material';
 import { Folder } from '@mui/icons-material';
 import { Storage } from '@mui/icons-material';
@@ -131,7 +131,7 @@ function Dashboard() {
         { userHasDatabases ? 
             <AddDatabase setAddDb={setAddDb}/>
             :
-            <AddDatabase setAddDb={undefined}/>
+            <AddDatabase />
         }
         </Box>
     );
@@ -228,22 +228,26 @@ function Dashboard() {
                             }>
                             { dbs.map((data: DatabaseEntry)  => (
 
+                                <Box>
                                 <TreeItem onClick={() => changeCurrDb(data)} itemId={"db-" + data.id} label={
                                     <Box display='flex'>
                                         <Storage sx={{marginRight:'8px'}}/>
                                         {data.data.connection_data.database}
                                     </Box>
                                 }/>
+                                </Box>
                                 
                                               ))
                             }
+                            <TreeItem onClick={() => setAddDb(true)} itemId={`addDb-${key}`} label={
+                                <Box display='flex'>
+                                   <Add sx={{ marginRight: '8px' }}/>
+                                   Add a Database
+                                </Box>
+                            }/>
                             </TreeItem>
                         ))}
                           </SimpleTreeView>
-
-                          <Button variant='contained' onClick={() => {setAddDb(!addDb)}} color='info'>
-                            Add a Database
-                          </Button>
                         </Drawer>
                         <Box>
                             <Fab color="secondary"
