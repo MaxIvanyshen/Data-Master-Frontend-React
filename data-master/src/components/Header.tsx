@@ -30,12 +30,7 @@ const theme = createTheme({
 
 
 function Header(user?: any) {
-    const savedUser = localStorage.getItem('user');
-    if(savedUser) {
-        user = savedUser;
-    } else {
-        user = user.user;
-    }
+    user = user.user;
 
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);

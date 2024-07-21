@@ -7,7 +7,6 @@ import { useState, useEffect } from 'react';
 import PostgresForm from './dbDataForms/postgresForm';
 import MySQLForm from './dbDataForms/mysqlForm';
 import MongoForm from './dbDataForms/mongoForm';
-import { ArrowBack } from '@mui/icons-material';
 import Header from './Header';
 import { useNavigate } from 'react-router-dom';
 import authenticatedFetch from '../utils/apiUtil';
@@ -136,7 +135,7 @@ const AddDatabase = () => {
               </Tabs>
             </Box>
                 <CustomTabPanel value={value} index={0}>
-                    <PostgresForm/>
+                    <PostgresForm />
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={1}>
                     <MySQLForm/>

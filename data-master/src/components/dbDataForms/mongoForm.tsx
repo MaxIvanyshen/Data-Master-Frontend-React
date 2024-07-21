@@ -8,9 +8,15 @@ import {
     Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import authenticatedFetch from "../../utils/apiUtil";
 
-function MongoForm() {
-    const [formData, setFormData] = useState({
+interface formProps {
+    form?: any,
+    edit?: boolean
+}
+
+const MongoForm: React.FC<formProps> = ({form, edit}) => {
+    const [formData, setFormData] = useState(form ? form : {
         connection_string: "",
         host: "",
         port: 0,
@@ -18,6 +24,8 @@ function MongoForm() {
         user: "",
         password: "",
     });
+
+    const navigate = useNavigate();
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         const { name, value } = e.target;
@@ -27,15 +35,47 @@ function MongoForm() {
         });
     }
 
-    const navigate = useNavigate();
-
+    async function sendDbData(e: any) {
+        e.preventDefault();
+        let method = 'POST';
+        if(edit) {
+            method = 'PUT';
+        }
+        try {
+            const url = `${process.env.REACT_APP_BACKEND_URL}/mongo/data`;
+            const response = await authenticatedFetch(url, {
+                method: method,
+                data: JSON.stringify({
+                    "connection_string": formData.connection_string,
+                    "connection_data": {
+                        "host": formData.host,
+                        "port": formData.port,
+                        "user": formData.user,
+                        "password": formData.password,
+                        "database": formData.database,
+                    },
+                }),
+            });
+            if(response?.status === 200) {
+                navigate("/dashboard");
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+/*
     async function sendDbData(e: any) {
         e.preventDefault();
         const token = localStorage.getItem('accessToken');
+        let method = 'POST';
+        if(edit) {
+            method = 'PUT';
+        }
         try {
-            const url = `${process.env.REACT_APP_BACKEND_URL}/mongo/add-data`;
+
+            const url = `${process.env.REACT_APP_BACKEND_URL}/mongo/data`;
             const response = await fetch(url, {
-                method: 'POST',
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
@@ -58,6 +98,7 @@ function MongoForm() {
             console.error('Error:', error);
         }
     }
+    */
     return (
         <Container style={{ display:'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
             <form onSubmit={sendDbData}>
@@ -295,7 +336,7 @@ function MongoForm() {
                             color="info" 
                             sx={{ mt: 2, textTransform: 'none',  borderRadius: '25px', fontSize: '18px', width: '180px' }}
                         >
-                            Add Database
+                        OK
                         </Button>
             </form>
         </Container>

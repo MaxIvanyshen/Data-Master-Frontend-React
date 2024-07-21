@@ -9,49 +9,52 @@ import {
     Switch,
 } from "@mui/material";
 import { Navigate, useNavigate } from "react-router-dom";
+import authenticatedFetch from "../../utils/apiUtil";
 
-function MySQLForm() {
-    const [formData, setFormData] = useState({
+interface formProps {
+    form?: any,
+    edit?: boolean
+}
+
+const MySQLForm: React.FC<formProps> = ({form, edit}) => {
+    const [formData, setFormData] = useState(form ? form : {
         connection_string: "",
         host: "",
         port: 0,
         database: "",
         user: "",
         password: "",
-        allowCustomQuery: false,
+        allowCustomQuery: true,
     });
 
-    function handleSwitchChange(e: React.ChangeEvent<HTMLInputElement>) {
-        setFormData({
-            ...formData,
-            allowCustomQuery: e.target.checked
-        });
-    }
+    const navigate = useNavigate();
 
+    function handleSwitchChange(e: React.ChangeEvent<HTMLInputElement>) {
+            setFormData({
+                ...formData,
+                allowCustomQuery: e.target.checked
+            });
+    }
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         const { name, value } = e.target;
         setFormData({
             ...formData,
             [name]: value,
-            allowCustomQuery: !e.target.checked
         });
     }
 
-    const navigate = useNavigate();
-
     async function sendDbData(e: any) {
         e.preventDefault();
-        const token = localStorage.getItem('accessToken');
+        let method = 'POST';
+        if(edit) {
+            method = 'PUT';
+        }
         try {
-            const url = `${process.env.REACT_APP_BACKEND_URL}/mysql/add-data`;
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
+            const url = `${process.env.REACT_APP_BACKEND_URL}/mysql/data`;
+            const response = await authenticatedFetch(url, {
+                method: method,
+                data: JSON.stringify({
                     "connection_string": formData.connection_string,
                     "connection_data": {
                         "host": formData.host,
@@ -61,9 +64,11 @@ function MySQLForm() {
                         "database": formData.database,
                     },
                     "allowCustomQuery": formData.allowCustomQuery,
-                })
+                }),
             });
-            navigate("/dashboard");
+            if(response?.status === 200) {
+                navigate("/dashboard");
+            }
         } catch (error) {
             console.error('Error:', error);
         }
@@ -305,7 +310,7 @@ function MySQLForm() {
                                         Allow custom queries:
                                     </Typography>
                                     <Box marginTop='-2px'>
-                                        <Switch color="info" value={formData.allowCustomQuery} onChange={handleSwitchChange}/>
+                                        <Switch color="info" checked={formData.allowCustomQuery} value={formData.allowCustomQuery} onChange={handleSwitchChange}/>
                                     </Box>
                                 </Box>
                                 <Typography variant="body2" style={{ width: '50%', marginLeft: '90px' , textAlign: 'left' }}  color="textSecondary">
@@ -321,7 +326,7 @@ function MySQLForm() {
                             color="info" 
                             sx={{ mt: 2, textTransform: 'none',  borderRadius: '25px', fontSize: '18px', width: '180px' }}
                         >
-                            Add Database
+                        OK
                         </Button>
             </form>
         </Container>

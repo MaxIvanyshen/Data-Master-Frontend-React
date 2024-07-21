@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import Signup from './components/Signup';
 import AddDatabase from './components/AddDatabase';
+import EditDatabase from './components/EditDatabase';
 
 function App() {
     return (
@@ -18,6 +19,7 @@ function App() {
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/add-database" element={<AddDatabase />} />
+                <Route path="/edit-database" element={<EditDatabase />} />
             </Routes>
         </BrowserRouter>
     );

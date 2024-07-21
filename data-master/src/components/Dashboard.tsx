@@ -126,7 +126,6 @@ function Dashboard() {
 
     useEffect(() => {
         const setFirstCurrDb = async (map: Map<String, object[]>) => {
-            console.log(map);
             Object.entries(map).map(([key, value]) => {
                 if (value.length > 0) {
                     setCurrDB(value[0]);
@@ -277,6 +276,10 @@ function Dashboard() {
                             {db?.data.connection_data.database}
                         </Typography>
                             <Fab color="secondary"
+                            onClick={() => {
+                                localStorage.setItem('editingDb', JSON.stringify(db));
+                                navigate("/edit-database");
+                            }}
                             style={{
                                 position: 'relative',
                                 top: '15px',
