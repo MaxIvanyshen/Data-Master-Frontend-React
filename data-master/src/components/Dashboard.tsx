@@ -110,6 +110,8 @@ function Dashboard() {
     const [userHasDatabases, setUserHasDatabases] = useState(false);
     const [treeViewOpen, setTreeViewOpen] = useState(true);
 
+    const [addDbTab, setAddDbTab] = useState(0);
+
     const [db, setCurrDB] = useState<DatabaseEntry>();
     const token = useCheckAccessToken();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -129,7 +131,7 @@ function Dashboard() {
     return (
         <Box>
         { userHasDatabases ? 
-            <AddDatabase setAddDb={setAddDb}/>
+            <AddDatabase setAddDb={setAddDb} tabIdx={addDbTab}/>
             :
             <AddDatabase />
         }
@@ -219,8 +221,8 @@ function Dashboard() {
                         anchor='left'
                         variant='persistent' open={treeViewOpen}>
                         <SimpleTreeView>
-                        { Object.entries(databases).map(([key, dbs]) => (
-                            <TreeItem itemId={key} label={
+                        { Object.entries(databases).map(([key, dbs], idx) => (
+                            <TreeItem onClick={() => setAddDbTab(idx)} itemId={key} label={
                                 <Box display='flex'>
                                     <Folder sx={{marginRight:'8px'}}/>
                                     {key}

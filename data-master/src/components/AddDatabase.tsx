@@ -50,10 +50,11 @@ function CustomTabPanel(props: TabPanelProps) {
 
 interface AddDatabaseProps {
    setAddDb?: (setDb: boolean) => void;
+   tabIdx?: number;
 }
 
-const AddDatabase: React.FC<AddDatabaseProps> = ({ setAddDb }) => {
-    const [value, setValue] = useState(0);
+const AddDatabase: React.FC<AddDatabaseProps> = ({ setAddDb, tabIdx }) => {
+    const [value, setValue] = useState(tabIdx ? tabIdx : 0);
 
     const handleChange = (_: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
