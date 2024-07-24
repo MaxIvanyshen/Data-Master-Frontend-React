@@ -161,22 +161,28 @@ const SqlEditor: React.FC<Props> = ({db}) => {
                 },
                 withCredentials: false,
             });
+            console.log(response?.data);
 
-            await fetchColumns(response?.data);
-            setQueryResultRows(response?.data);
+            if(response?.status == 200) {
+                if(Array.isArray(response?.data)) {
+                    await fetchColumns(response?.data);
+                    setQueryResultRows(response?.data);
+                    setQueryResultDialogOpen(true);
+                }
 
-            setError("");
-            setErrorDialogOpen(false);
+                setError("");
+                setErrorDialogOpen(false);
 
-            setQueryResultDialogOpen(true);
+                const newHistory = [query, ...history ];
+                setHistory(newHistory); 
+                saveHistoryToLocalStorage(newHistory);
+            }
 
-            const newHistory = [query, ...history ];
-            setHistory(newHistory); 
-            saveHistoryToLocalStorage(newHistory);
 
         } catch(error: any) {
-            if(error.response.status == 400) {
-                setError("Error while running query: " + error.response.data.message);
+            console.log(error);
+            if(axios.isAxiosError(error) && error.response?.status == 400) {
+                setError("Error while running query: " + error.response?.data.message);
                 setErrorDialogOpen(true);
             }
             return;

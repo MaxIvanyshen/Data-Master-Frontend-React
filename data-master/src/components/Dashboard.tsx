@@ -13,6 +13,7 @@ import { useMediaQuery } from '@mui/material';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import SqlEditorView from './dashboardViews/SqlEditorView';
+import Overview from './dashboardViews/Overview';
 
 const theme = createTheme({
     typography: {
@@ -324,7 +325,7 @@ function Dashboard() {
                             </Tabs>
                             </Box>
                             <CustomTabPanel value={value} index={0}>
-                            overview
+                                <Overview db={db} setValue={setValue} />
                             </CustomTabPanel>
                             <CustomTabPanel value={value} index={1}>
                                 <DatabaseView db={db}/>
