@@ -2,7 +2,7 @@ import { Tabs, Tab, Box, Container, Typography, Dialog, DialogTitle, DialogConte
 import { DataGrid, GridColDef, GridToolbar } from '@mui/x-data-grid';
 import ErrorIcon from '@mui/icons-material/Error';
 import { useEffect } from "react";
-import authenticatedFetch from "../../utils/apiUtil";
+import { authenticatedFetch } from "../../utils/apiUtil";
 import { DatabaseEntry, Db } from '../Dashboard';
 import { useState } from "react";
 

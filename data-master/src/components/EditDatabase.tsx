@@ -1,7 +1,7 @@
 import { Box, Container, createTheme, ThemeProvider, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import authenticatedFetch from "../utils/apiUtil";
+import { authenticatedFetch } from "../utils/apiUtil";
 import { Db } from "./Dashboard";
 import MongoForm from "./dbDataForms/mongoForm";
 import MysqlForm from "./dbDataForms/mysqlForm";

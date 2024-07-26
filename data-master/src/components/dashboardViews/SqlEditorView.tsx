@@ -9,7 +9,7 @@ import ErrorIcon from '@mui/icons-material/Error';
 import UpgradeIcon from '@mui/icons-material/Upgrade';
 import { Box } from "@mui/system";
 import { Db } from "../Dashboard";
-import authenticatedFetch from "../../utils/apiUtil";
+import { authenticatedFetch } from "../../utils/apiUtil";
 import axios from "axios";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 

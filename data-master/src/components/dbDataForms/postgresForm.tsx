@@ -9,7 +9,7 @@ import {
     Switch,
 } from "@mui/material";
 import { Navigate, useNavigate } from "react-router-dom";
-import authenticatedFetch from "../../utils/apiUtil";
+import { authenticatedFetch } from "../../utils/apiUtil";
 
 interface formProps {
     form?: any,

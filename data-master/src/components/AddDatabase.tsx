@@ -9,7 +9,7 @@ import MySQLForm from './dbDataForms/mysqlForm';
 import MongoForm from './dbDataForms/mongoForm';
 import Header from './Header';
 import { useNavigate } from 'react-router-dom';
-import authenticatedFetch from '../utils/apiUtil';
+import { authenticatedFetch } from '../utils/apiUtil';
 
 const theme = createTheme({
     typography: {

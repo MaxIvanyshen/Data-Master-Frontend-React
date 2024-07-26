@@ -9,7 +9,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import authenticatedFetch from '../utils/apiUtil';
+import { authenticatedFetch } from '../utils/apiUtil';
 
 const theme = createTheme({
     typography: {

@@ -2,7 +2,7 @@ import { Toolbar, Drawer, Fab, Tabs, Tab, Button, Typography, Container, Box, Gr
 import { createTheme, ThemeProvider, makeStyles } from '@mui/material/styles';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect, MouseEventHandler } from 'react';
-import authenticatedFetch from '../utils/apiUtil';
+import { authenticatedFetch } from '../utils/apiUtil';
 import DatabaseView from './dashboardViews/DatabaseView';
 import Header from './Header';
 import { Add, Menu } from '@mui/icons-material';
