@@ -32,11 +32,84 @@ interface ChartData {
 
 const Overview: React.FC<Props> = ({db, setValue}) => {
     const [stats, setStats] = useState<object>({});
-    const [memoryUsageData, setMemoryUsageData] = useState<ChartData[]>();
 
-    const source: CancelTokenSource = axios.CancelToken.source();
+    ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+
+    const getCurrentTimestamp = () => {
+        const now = new Date();
+
+        const year = now.getFullYear();
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+
+        return `${year}-${month}-${day} ${hours}:${minutes}`;
+    }
+
+    const boundData = (data: any[]) => {
+        if(data.length > 10) {
+            data = data.slice(data.length - 11, data.length - 1);
+        }
+        return data
+    }
 
     useEffect(() => {
+        
+        const parseMemoryUsage = (currMemoryUsage: any | undefined) => {
+            const localStorageKey = `memoryUsage-${db?.db}-${db?.data.connection_data.database}`;
+            const memoryUsageDataStr = localStorage.getItem(localStorageKey);
+            let memoryUsage: ChartData[] = [];
+            if(memoryUsageDataStr) {
+                memoryUsage = JSON.parse(memoryUsageDataStr);
+            }
+            if(currMemoryUsage) {
+                const currentData = {
+                    data: currMemoryUsage.databaseTotal,
+                    timestamp: getCurrentTimestamp(),
+                }
+
+                memoryUsage = boundData([...memoryUsage, currentData]);
+                localStorage.setItem(localStorageKey, JSON.stringify(memoryUsage));
+            }
+        }
+
+        const parseActiveConnections = (currActiveConnections: number | undefined) => {
+            const localStorageKey = `activeConnections-${db?.db}-${db?.data.connection_data.database}`;
+            const activeConnectionsDataStr = localStorage.getItem(localStorageKey);
+            let activeConnections: ChartData[] = [];
+            if(activeConnectionsDataStr) {
+                activeConnections = JSON.parse(activeConnectionsDataStr);
+            }
+            if(currActiveConnections) {
+               const currentData = {
+                   data: currActiveConnections,
+                   timestamp: getCurrentTimestamp(),
+               } 
+
+               activeConnections = boundData([...activeConnections, currentData]);
+               localStorage.setItem(localStorageKey, JSON.stringify(activeConnections));
+            }
+        };
+
+        const parseOperations = (currOperations: any | undefined) => {
+            const localStorageKey = `operations-${db?.db}-${db?.data.connection_data.database}`;
+            const operationsDataStr = localStorage.getItem(localStorageKey);
+            let operations: ChartData[] = [];
+            if(operationsDataStr) {
+                operations = JSON.parse(operationsDataStr);
+            }
+            if(currOperations) {
+                const currentData = {
+                    data: currOperations,
+                    timestamp: getCurrentTimestamp(),
+                }
+                operations = boundData([...operations, currentData]);
+                console.log(operations.length);
+                localStorage.setItem(localStorageKey, JSON.stringify(operations));
+            }
+        }
+
         const fetchStats = async () => {
             let provider = 'postgres';
             if(db?.db === Db.MySQL) {
@@ -55,9 +128,7 @@ const Overview: React.FC<Props> = ({db, setValue}) => {
                     cancelAllRequests();
                 }
                 const url = `${process.env.REACT_APP_BACKEND_URL}/${provider}/stats?database=${dbName}`;
-                const response = await authenticatedFetch(url, {
-                    cancelToken: source.token,
-                });
+                const response = await authenticatedFetch(url);
                 setStats(response?.data as object);
                 currStats = response?.data;
             } catch(e) {
@@ -70,31 +141,9 @@ const Overview: React.FC<Props> = ({db, setValue}) => {
                 return;
             }
 
-            const localStorageKey = `memoryUsage-${db?.db}-${db?.data.connection_data.database}`;
-            const memoryUsageDataStr = localStorage.getItem(`memoryUsage-${db?.db}-${db?.data.connection_data.database}`);
-            let memoryUsage: ChartData[] = [];
-            if(memoryUsageDataStr) {
-                memoryUsage = JSON.parse(memoryUsageDataStr);
-            }
-            if((currStats as any)["memoryUsage"]) {
-                const now = new Date();
-
-                const year = now.getFullYear();
-                const month = (now.getMonth() + 1).toString().padStart(2, '0');
-                const day = now.getDate().toString().padStart(2, '0');
-                const hours = now.getHours().toString().padStart(2, '0');
-                const minutes = now.getMinutes().toString().padStart(2, '0');
-
-                const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`;
-
-                const currentData = {
-                    data: (currStats as any)["memoryUsage"]["databaseTotal"],
-                    timestamp: formattedDate
-                }
-                memoryUsage = [...memoryUsage, currentData];
-                localStorage.setItem(`memoryUsage-${db?.db}-${db?.data.connection_data.database}`, JSON.stringify(memoryUsage));
-                setMemoryUsageData(memoryUsage);
-            }
+            parseMemoryUsage((currStats as any)["memoryUsage"]);
+            parseActiveConnections((currStats as any)["activeConnections"]);
+            parseOperations((currStats as any)["operations"]);
         }
 
         fetchStats();
@@ -122,9 +171,9 @@ const Overview: React.FC<Props> = ({db, setValue}) => {
     };
 
     const memoryUsageChart = () => {
-        ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
         let dataStr = localStorage.getItem(`memoryUsage-${db?.db}-${db?.data.connection_data.database}`);
+
         if(!dataStr) {
             dataStr = '[]';
         }
@@ -148,14 +197,6 @@ const Overview: React.FC<Props> = ({db, setValue}) => {
         const options = {
             responsive: true,
             plugins: {
-                legend: {
-                    display: true,
-                    position: 'top' as const,
-                },
-                title: {
-                    display: true,
-                    text: 'Database Memory Usage',
-                },
                 tooltip: {
                     callbacks: {
                         label: function (context: any) {
@@ -180,6 +221,137 @@ const Overview: React.FC<Props> = ({db, setValue}) => {
             </Box>
         );
     };
+
+    const activeConnectionsChart = () => {
+        let dataStr = localStorage.getItem(`activeConnections-${db?.db}-${db?.data.connection_data.database}`);
+
+        if(!dataStr) {
+            dataStr = '[]';
+        }
+
+        const data = JSON.parse(dataStr);
+
+        const labels = data.map((item: ChartData, index: number) => item.timestamp);
+
+        const chartData = {
+            labels,
+            datasets: [
+                {
+                    label: 'Active Connections',
+                    data: data.map((item: any) => item.data),
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true,
+                },
+            ],
+        };
+        const options = {
+            responsive: true,
+            plugins: {
+                title: {
+                    text: 'Active Connections',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context: any) {
+                            return `${context.dataset.label}: ${context.raw}`
+                        },
+                    },
+                },
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Time',
+                    },
+                },
+            },
+        };
+
+        return (
+            <Box>
+                <Line data={chartData} options={options}/>
+            </Box>
+        );
+    };
+
+    const operationsChart = () => {
+
+        let dataStr = localStorage.getItem(`operations-${db?.db}-${db?.data.connection_data.database}`);
+
+        if(!dataStr) {
+            dataStr = '[]';
+        }
+
+        const data = JSON.parse(dataStr);
+
+        let eachOperationData: any = {};
+        data.forEach((item: any) => {
+            Object.keys(item.data).forEach((key) => {
+                eachOperationData[key] = [];
+            }); 
+        });
+        data.forEach((item: any) => {
+            Object.entries(item.data).forEach(([key, value]) => {
+                eachOperationData[key].push(value);
+            }); 
+        });
+        console.log(eachOperationData);
+
+        const labels = data.map((item: ChartData, index: number) => item.timestamp);
+
+        const getRandomColor = () => {
+            const r = Math.floor(Math.random() * 255);
+            const g = Math.floor(Math.random() * 255);
+            const b = Math.floor(Math.random() * 255);
+            return `rgb(${r},${g},${b})`;
+        }
+
+        const operationsDatasets = Object.entries(eachOperationData).map(([key, value]) => {
+            return {
+                label: key,
+                data: value,
+                fill: true,
+                backgroundColor: getRandomColor(),
+            }
+        });
+
+
+        const chartData = {
+            labels,
+            datasets: [
+                ...operationsDatasets,
+            ],
+        };
+        const options = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function (context: any) {
+                            return `${context.dataset.label}: ${context.raw}`;
+                        },
+                    },
+                },
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Time',
+                    },
+                },
+            },
+        };
+
+        return (
+            <Box>
+            <Line data={chartData} options={options}/>
+            </Box>
+        );
+    }
 
     const recentQueriesList = () => {
             const localStorageKey = `queryHistory-${db?.db}-${db?.data.connection_data.database}`;
@@ -225,8 +397,49 @@ const Overview: React.FC<Props> = ({db, setValue}) => {
                                     </Typography>
                                } 
                            />
+                           <Divider/>
                            <CardContent>
                                 {memoryUsageChart()} 
+                           </CardContent>
+                       </Card> 
+                    </Grid>
+                    <Grid item>
+                       <Card sx={{ 
+                           borderRadius: '18px',
+                           border: '1px solid #CAC4D0',
+                           backgroundColor: '#FEF7FF',
+                           boxShadow: 'none',
+                       }}> 
+                           <CardHeader
+                               title={
+                                    <Typography variant="body1">
+                                        Active Connections
+                                    </Typography>
+                               } 
+                           />
+                           <Divider/>
+                           <CardContent>
+                                {activeConnectionsChart()} 
+                           </CardContent>
+                       </Card> 
+                    </Grid>
+                    <Grid item>
+                       <Card sx={{ 
+                           borderRadius: '18px',
+                           border: '1px solid #CAC4D0',
+                           backgroundColor: '#FEF7FF',
+                           boxShadow: 'none',
+                       }}> 
+                           <CardHeader
+                               title={
+                                    <Typography variant="body1">
+                                        Operations
+                                    </Typography>
+                               } 
+                           />
+                           <Divider/>
+                           <CardContent>
+                                {operationsChart()} 
                            </CardContent>
                        </Card> 
                     </Grid>

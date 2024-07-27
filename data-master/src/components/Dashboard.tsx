@@ -298,7 +298,9 @@ function Dashboard() {
                         sx={{
                             backgroundColor: '#FEF7FF',
                             width: '100%',
+                            height: '66vh',
                             borderRadius: '25px',
+                            overflow: 'auto',
                         }}
                         >
                             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
