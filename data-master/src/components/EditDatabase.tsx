@@ -7,6 +7,7 @@ import MongoForm from "./dbDataForms/mongoForm";
 import MysqlForm from "./dbDataForms/mysqlForm";
 import PostgresForm from "./dbDataForms/postgresForm";
 import Header from "./Header";
+import bg from './assets/bg.jpg';
 
 const theme = createTheme({
     typography: {
@@ -78,10 +79,22 @@ function EditDatabase() {
     return (
         <ThemeProvider theme={theme}>
             <Header user={data}/>
-          <Container sx={{
-              paddingTop: '50px',
-          }}>
-              <Typography color='#35485F' sx={{ fontWeight: 'bold', fontSize: {'xs': '35px', 'sm': '50px', 'md': '65px'}}} gutterBottom>
+      <Container 
+      sx={{
+                height: {'xs': '100vh', 'md': '91.9vh'},
+      }}
+      style={{
+                width: '100%',
+                maxWidth: '100%',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+                backgroundImage: `url(${bg})`,
+                backgroundPosition: 'bottom',
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: 'cover',
+                textAlign: 'center',
+     }} maxWidth="xl">
+              <Typography color='#35485F' sx={{ paddingTop: 5, fontWeight: 'bold', fontSize: {'xs': '35px', 'sm': '50px', 'md': '65px'}}} gutterBottom>
                     {db?.data.connection_data.database}
               </Typography>
               <Container

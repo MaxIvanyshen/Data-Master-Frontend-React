@@ -120,13 +120,21 @@ function Dashboard() {
         setValue(newValue);
     };
 
+    const localStorageCurrDb = 'currentDb';
+
     const changeCurrDb = (data: DatabaseEntry) => {
         setCurrDB(data);
+        localStorage.setItem(localStorageCurrDb, JSON.stringify(data));
         setValue(0);
     }
 
     useEffect(() => {
         const setFirstCurrDb = async (map: Map<String, object[]>) => {
+            const currDbStr = localStorage.getItem(localStorageCurrDb);
+            if(currDbStr) {
+                setCurrDB(JSON.parse(currDbStr));
+                return;
+            }
             Object.entries(map).map(([key, value]) => {
                 if (value.length > 0) {
                     setCurrDB(value[0]);
