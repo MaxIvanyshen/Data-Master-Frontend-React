@@ -1,4 +1,3 @@
-
 import { Tabs, Tab, Box, Container, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, CardContent, CardActions, Card, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, List, CardHeader } from "@mui/material";
 import { DataGrid, GridColDef, GridToolbar } from '@mui/x-data-grid';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -216,7 +215,7 @@ const Overview: React.FC<Props> = ({db, setValue}) => {
         };
 
         return (
-            <Box>
+            <Box sx={{ width: '400px' }}>
                 <Line data={chartData} options={options}/>
             </Box>
         );
@@ -270,7 +269,7 @@ const Overview: React.FC<Props> = ({db, setValue}) => {
         };
 
         return (
-            <Box>
+            <Box sx={{ width: '400px' }}>
                 <Line data={chartData} options={options}/>
             </Box>
         );
@@ -347,7 +346,7 @@ const Overview: React.FC<Props> = ({db, setValue}) => {
         };
 
         return (
-            <Box>
+            <Box sx={{ width: '400px', height: '400px' }}>
             <Line data={chartData} options={options}/>
             </Box>
         );
@@ -363,19 +362,20 @@ const Overview: React.FC<Props> = ({db, setValue}) => {
             }
 
             return (
-
-                <List>
-                { recentQueries.map((query) => (
-                    <ListItem>
-                    <ListItemButton onClick={changeTabToSqlEditor} sx={{ width: '100%' }}>
-                    <ListItemIcon sx={{ marginRight: '-18px' }}>
-                    {renderIcon(query)}             
-                    </ListItemIcon>
-                    {query}
-                    </ListItemButton>
-                    </ListItem>
-                ))}
-                </List>
+                <Box sx={{ width: '400px' }}>
+                    <List>
+                    { recentQueries.map((query) => (
+                        <ListItem>
+                            <ListItemButton onClick={changeTabToSqlEditor} sx={{ width: '100%' }}>
+                            <ListItemIcon sx={{ marginRight: '-18px' }}>
+                                {renderIcon(query)}             
+                            </ListItemIcon>
+                                {query}
+                            </ListItemButton>
+                        </ListItem>
+                    ))}
+                    </List>
+                </Box>
             )
     }
 
@@ -443,26 +443,31 @@ const Overview: React.FC<Props> = ({db, setValue}) => {
                            </CardContent>
                        </Card> 
                     </Grid>
-                    <Grid item>
-                       <Card sx={{ 
-                           borderRadius: '18px',
-                           border: '1px solid #CAC4D0',
-                           backgroundColor: '#FEF7FF',
-                           boxShadow: 'none',
-                       }}> 
-                           <CardHeader
-                               title={
-                                    <Typography variant="body1">
-                                        Recent Queries
-                                    </Typography>
-                               } 
-                           />
-                           <Divider/>
-                           <CardContent>
-                            {recentQueriesList()}
-                           </CardContent>
-                       </Card> 
-                    </Grid>
+                    { db?.db !== Db.MongoDB ? 
+                        <Grid item>
+                           <Card sx={{ 
+                               borderRadius: '18px',
+                               border: '1px solid #CAC4D0',
+                               backgroundColor: '#FEF7FF',
+                               boxShadow: 'none',
+                           }}> 
+                               <CardHeader
+                                   title={
+                                        <Typography variant="body1">
+                                            Recent Queries
+                                        </Typography>
+                                   } 
+                               />
+                               <Divider/>
+                               <CardContent>
+                                {recentQueriesList()}
+                               </CardContent>
+                           </Card> 
+                        </Grid>
+                        :
+                        <Box>
+                        </Box>
+                    }
                 </Grid>
             </Box>
         </Container>
