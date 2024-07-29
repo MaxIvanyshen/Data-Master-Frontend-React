@@ -4,6 +4,7 @@ import bg from './assets/bg.jpg'
 import icon from './assets/icon.png';
 import GoogleIcon from '@mui/icons-material/Google';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const theme = createTheme({
     typography: {
@@ -26,8 +27,8 @@ function Signup() {
     const isMediumOrLarger = useMediaQuery(theme.breakpoints.up('md'));
     const [error, setError] = useState('')
     const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
+        firstname: "",
+        lastname: "",
         email: "",
         password: ""
     });
@@ -40,6 +41,8 @@ function Signup() {
         });
     };
 
+    const navigate = useNavigate();
+
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError('')
@@ -51,9 +54,17 @@ function Signup() {
                 },
                 body: JSON.stringify(formData)
             });
-            const result = await response.json();
-            if(response.status == 400) {
-                setError(result.message);
+
+            if(response.status === 400) {
+                setError('Invalid email format');
+            }
+            if(response.status === 401) {
+                setError('Invalid email or password') 
+            }
+
+            if(response.status == 201) {
+                localStorage.setItem('accessToken', (await response.json())["accessToken"]);
+                navigate("/"); 
             }
         } catch (error) {
             console.error('Error:', error);
@@ -93,8 +104,8 @@ function Signup() {
                             variant="outlined"
                             margin="normal"
                             type="text"
-                            name="firstName"
-                            value={formData.firstName}
+                            name="firstname"
+                            value={formData.firstname}
                             onChange={handleChange}        
                             InputLabelProps={{
                                 style: { color: 'white' },
@@ -127,8 +138,8 @@ function Signup() {
                             variant="outlined"
                             margin="normal"
                             type="text"
-                            name="lastName"
-                            value={formData.lastName}
+                            name="lastname"
+                            value={formData.lastname}
                             onChange={handleChange}        
                             InputLabelProps={{
                                 style: { color: 'white' },

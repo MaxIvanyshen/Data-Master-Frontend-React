@@ -4,6 +4,7 @@ import bg from './assets/bg.jpg'
 import icon from './assets/icon.png';
 import GoogleIcon from '@mui/icons-material/Google';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const theme = createTheme({
     typography: {
@@ -38,6 +39,8 @@ function Login() {
         });
     };
 
+    const navigate = useNavigate();
+
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError('')
@@ -55,6 +58,11 @@ function Login() {
             }
             if(response.status === 401) {
                 setError('Invalid email or password') 
+            }
+
+            if(response.status == 200) {
+                localStorage.setItem('accessToken', (await response.json())["accessToken"]);
+                navigate("/"); 
             }
         } catch (error) {
             console.error('Error:', error);

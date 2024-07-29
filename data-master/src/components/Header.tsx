@@ -8,7 +8,7 @@ import SupportIcon from '@mui/icons-material/Support';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { authenticatedFetch } from '../utils/apiUtil';
 
 const theme = createTheme({
@@ -41,7 +41,7 @@ function Header(user?: any) {
         authenticatedFetch(`${process.env.REACT_APP_BACKEND_URL}/auth/logout`, {
             method: 'POST',
         })
-        localStorage.removeItem('accessToken');
+        localStorage.clear();
         navigate("/");
     }
 
